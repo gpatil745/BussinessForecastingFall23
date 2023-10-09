@@ -1,0 +1,95 @@
+---
+title: "Assignment_4"
+output:
+  html_document: default
+  pdf_document: default
+date: "2023-10-08"
+---
+
+```{r}
+library(readxl)
+Gold_Price_Monthly_Dataset <- read_excel("C:/Users/mumba/Desktop/Gold_Price_Monthly_Dataset.xls")
+View(Gold_Price_Monthly_Dataset)
+
+library (fpp)
+library (fpp2)
+library (TTR)
+
+View(Gold_Price_Monthly_Dataset)
+attributes(Gold_Price_Monthly_Dataset)
+plot(x=Gold_Price_Monthly_Dataset$Date, y=Gold_Price_Monthly_Dataset$Price,type="l")
+Acf(Gold_Price_Monthly_Dataset$Price)
+
+
+#convert into timeseries
+
+ts_data_new <- ts(Gold_Price_Monthly_Dataset$Price, start = c(2011, 1),end= c(2020, 5), frequency = 12)
+
+#take Mean of all
+mean_forecast <- meanf(x=Gold_Price_Monthly_Dataset$Price,5)
+mean_forecastnew <- meanf(ts_data_new)
+plot(mean_forecastnew)
+
+# Naive
+naive_forecast <- naive(ts_data_new,5)
+plot(naive_forecast)
+
+# Random Walk
+rwf_forecast <- rwf(ts_data_new,5)
+rwf_forecast <- rwf(ts_data_new,5, drift=TRUE)
+
+# Seasonal Naive
+snaive_forecast <- snaive(ts_data_new,5)
+
+# Moving Averages
+MA5_forecast <- ma(ts_data_new,order=5)
+MA9_forecast <- ma(ts_data_new,order=9)
+
+#Plot the time series and different model forecasts in one chart
+plot(mean_forecastnew)
+lines(naive_forecast$mean,col="red")
+lines(rwf_forecast$mean,col="green")
+lines(snaive_forecast$mean,col="plum")
+lines(MA5_forecast,col="pink")
+lines(MA9_forecast,col="blue")
+
+#Attributes
+attributes(naive_forecast)
+
+# Decomposition
+ets_forecast <- ets(ts_data_new)
+plot(ets_forecast)
+
+
+attributes(ets_forecast)
+ets_forecast$mse
+
+# HoltWinters
+
+HW_forecast <- HoltWinters(ts_data_new)
+
+plot(HW_forecast)
+
+SSE_Simple <- HoltWinters(ts_data_new,beta=FALSE,gamma=FALSE)
+attributes(SSE_Simple)
+plot(SSE_Simple)
+SSE_Simple$SSE
+head(SSE_Simple$fitted)
+
+
+#Forecast
+forecast_ets_1 <- forecast.ets(ets_forecast, h=5)
+plot(forecast_ets_1)
+forecast_ets_2 <- forecast(ets_forecast, h=5)
+plot(forecast_ets_2)
+
+accuracy(naive_forecast)
+
+accuracy(rwf_forecast)
+
+accuracy(ets_forecast)
+```
+
+
+
+
