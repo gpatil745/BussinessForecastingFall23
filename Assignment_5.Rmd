@@ -1,0 +1,67 @@
+---
+title: "Assignment_5"
+output: html_document
+date: "2023-10-27"
+---
+
+```{r}
+
+library(fpp)
+library(fpp2)
+
+
+library(readxl)
+Gold_Price_Monthly_Dataset <- read_excel("C:/Users/mumba/Desktop/Gold_Price_Monthly_Dataset.xls")
+View(Gold_Price_Monthly_Dataset)
+
+
+
+plot(Gold_Price_Monthly_Dataset$Price, type = "l")
+print("This is a line graph that is showing the price of Gold on January, 2011 till Juy, 2020")
+
+head(x=Gold_Price_Monthly_Dataset$Date, y=Gold_Price_Monthly_Dataset$Price,type="l")
+
+
+#Convert into time series
+ts_data_new <- ts(Gold_Price_Monthly_Dataset$Price, start = c(2011, 1), frequency = 12)
+
+stl_decomp <- stl(ts_data_new, s.window = "periodic")
+
+print("This function in R is used for seasonal decomposition of time series data. It decomposes a time series into three components: seasonal, trend, and remainder. In this case, periodic is chosen, which means that the seasonal component is estimated using a periodic moving average.")
+
+plot(stl_decomp)
+print("This is the plot of seasonal,trend, and remainder for the Price of Gold from 2011 till JUly 2020")
+
+#Each attributes
+attributes(stl_decomp)
+
+seasadj(stl_decomp)
+print("The seasonal adjustment")
+
+plot(ts_data_new)
+lines(seasadj(stl_decomp), col="red")
+
+print("Plotting the line graph showing the actual and seasonal adjustment")
+
+# Default period forecast
+f_stl <- forecast(stl_decomp)
+
+# you can pass the # of period
+f_stl <- forecast(stl_decomp,h=15)
+
+print("The h parameter specifies the number of future time periods for which you want to generate forecasts. In this case, the forecasts is requested for the next 15 time periods.")
+f_stl
+plot(f_stl)
+
+# There is more than one way to do things
+edecomp_elec <- decompose(ts_data_new)
+
+print("This is stating that the forecast from 2020 is going in the upward trend in future after the sesonal, trend and residual components")
+
+# Each one shows different attributes 
+attributes(edecomp_elec)
+seasadj(edecomp_elec)
+
+
+```
+
