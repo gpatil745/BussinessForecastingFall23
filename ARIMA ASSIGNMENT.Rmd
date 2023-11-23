@@ -1,0 +1,123 @@
+---
+title: "Assignment ARIMA"
+output: html_document
+date: "2023-11-22"
+---
+
+```{r }
+
+library(fpp)
+```
+```{r}
+library(fpp2)
+```
+```{r}
+library(readxl)
+Gold_Price_Monthly_Dataset <- read_excel("C:/Users/mumba/Desktop/Gold_Price_Monthly_Dataset.xls")
+View(Gold_Price_Monthly_Dataset)
+
+plot(Gold_Price_Monthly_Dataset$Price, type = "l")
+```
+This is a line graph that is showing the price of Gold on January, 2011 till Juy, 2020
+
+
+```{r}
+head(x=Gold_Price_Monthly_Dataset$Date, y=Gold_Price_Monthly_Dataset$Price,type="l")
+```
+```{r}
+#Convert into time series
+ts_data_new <- ts(Gold_Price_Monthly_Dataset$Price, start = c(2011, 1), frequency = 12)
+```
+
+```{r}
+tsdisplay(ts_data_new)
+```
+```{r}
+tsdiff <- diff(ts_data_new, differences = 1)
+plot(tsdiff)
+```
+```{r}
+tsdisplay(tsdiff)
+```
+```{r}
+auto_fit <- auto.arima(ts_data_new, trace=TRUE, stepwise = FALSE)
+```
+1. Output Summary:
+The ARIMA(0,1,4) model is used for predicting future values in a time series. It doesn't rely on past values directly, but it does use the difference between consecutive values to make the data more predictable (achieve stationarity). Additionally, it considers the last four forecast errors to better capture and adjust for random fluctuations or residual errors in the data.
+
+```{r}
+auto_fit
+```
+The sigma square is 2159 for the model.
+
+```{r}
+#Each attributes
+attributes(auto_fit)
+
+```
+3. Perform and Plot the forecast for the next five periods.
+
+```{r}
+plot(forecast(auto_fit,h=5,level=c(99.5)))
+```
+
+The forecast for the next five periods seems to be constant with slightly decrease in the price.
+
+2.RESIDUAL ANALYSIS
+
+```{r}
+Acf(ts_data_new)
+```
+```{r}
+Acf(tsdiff)
+```
+```{r}
+Acf(auto_fit$residuals)
+```
+```{r}
+plot.ts(residuals(auto_fit))
+```
+```{r}
+hist(auto_fit$residuals)
+```
+```{r}
+tsdiag(auto_fit)
+```
+Seasonal Data
+
+```{r}
+nsdiffs(ts_data_new)
+```
+```{r}
+ndiffs(ts_data_new)
+```
+```{r}
+ndiffs((diff(ts_data_new,4)))
+```
+```{r}
+tsdisplay(diff(diff(ts_data_new,4)))
+```
+```{r}
+fit3 <- auto.arima(ts_data_new,trace=TRUE, stepwise = FALSE )
+```
+```{r}
+fit3
+```
+Residual Analysis
+
+```{r}
+Acf(fit3$residuals)
+```
+```{r}
+plot.ts(residuals(fit3))
+```
+```{r}
+hist(fit3$residuals)
+```
+
+4. Show the accuracy of your ARIMA model
+```{r}
+accuracy(auto_fit)
+```
+
+
